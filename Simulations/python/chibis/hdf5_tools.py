@@ -1,5 +1,5 @@
-import logging
 import abc
+import json
 import logging
 import os
 import shutil
@@ -12,6 +12,18 @@ from numpy import dtype
 from tables import open_file, File, Group, Filters
 
 from .run_tools import InputData
+
+
+def dict_as_flat(data: dict):
+    result = {}
+    for key, value in data.items():
+        if isinstance(value, dict):
+            sub = dict_as_flat(value)
+            for sk, sv in sub.items():
+                result[f"{key}_{sk}"] = sv
+        else:
+            result[key] = value
+    return result
 
 
 class Reader(abc.ABC):
@@ -38,7 +50,7 @@ class ConverterFromBinToHDF5:
         )
 
     def convert(self, paths_data: Union[List, str], path_h5file: str, mode: str = "a",
-                meta: Optional[Union[List[Meta], Meta]] = None) -> str:
+                meta: Optional[Union[List[dict], dict]] = None) -> str:
 
         if isinstance(paths_data, str):
             paths_data = [paths_data]
@@ -58,7 +70,7 @@ class ConverterFromBinToHDF5:
                 group = h5file.create_group('/', nameGroup, title='Auto group from path {}'.format(path))
 
                 if meta is not None:
-                    meta_item = JsonMetaFormat().dump_meta(meta[indx]).encode("utf-8")
+                    meta_item = json.dumps(meta[indx]).encode("utf-8")
                     h5file.create_array(group, "meta", obj=meta_item).flush()
 
                 for reader in self.readers:
@@ -71,7 +83,7 @@ class ConverterFromBinToHDF5:
                         continue
                     logging.debug(str(table))
                     if meta is not None:
-                        for key, value in meta[indx].to_flat().items():
+                        for key, value in dict_as_flat(meta[indx]).items():
                             if sys.getsizeof(value) > 64 * 1024:
                                 continue
                             if "@" in key: continue
@@ -112,7 +124,7 @@ class dtypeDataReader(Reader):
         my_table.flush()
 
 
-class txtDataReader(Reader):
+class TxtDataReader(Reader):
     def __init__(self, filename: str, **kwargs):
         self.kwargs = kwargs
         Reader.__init__(self, filename)
@@ -154,6 +166,7 @@ class ProtoReader(Reader):
     def __call__(self, path: str, h5file: File, group: Group):
         self.proto_convertor(path,  h5file, group, self.settings)
 
+
 class ProtoSetConvertor(abc.ABC):
 
     def __init__(self, h5file: File, group: Group, filename: str = None, settings = None):
@@ -168,6 +181,7 @@ class ProtoSetConvertor(abc.ABC):
     @abc.abstractmethod
     def convert(self, data: bytes):
         pass
+
 
 class DtypeProtoSetConvertor(ProtoSetConvertor):
 
@@ -186,8 +200,10 @@ class DtypeProtoSetConvertor(ProtoSetConvertor):
         my_table = self.h5file.create_table(self.group, self.tableName, description=self.dtype, **self.settings)
         my_table.flush()
 
+
 class ProtoSetReader(Reader):
     BUFF_SIZE = 8
+
     def __init__(self, filename, proto_set_convertor):
         self.proto_convertor = proto_set_convertor
         Reader.__init__(self, filename)

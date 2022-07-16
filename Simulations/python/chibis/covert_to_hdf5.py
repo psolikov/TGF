@@ -3,7 +3,7 @@ import os
 
 import numpy as np
 
-from phd.satellite.satellite_pb2 import MeanRun
+from .satellite_pb2 import MeanRun
 from tables import File, Group, IsDescription, Float32Col, Int32Col
 from .satellite_pb2 import Run
 
@@ -41,6 +41,7 @@ def convert_satellite_proto(path, h5file: File, group: Group, settings):
         deposit.append()
     table.flush()
     return 0
+
 
 def convert_mean_run_proto(path, h5file: File, group: Group, settings):
     run = MeanRun()

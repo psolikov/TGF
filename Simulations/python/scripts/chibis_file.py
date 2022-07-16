@@ -4,16 +4,16 @@ from string import Template
 
 import numpy as np
 from dataforge import Meta
-from phd.satellite.covert_to_hdf5 import convert_satellite_proto
-from phd.satellite.run import input_generator_satellite
-from phd.utils.hdf5_tools import get_convertor, ProtoReader
-from phd.utils.run_tools import multirun_command, \
+from chibis.covert_to_hdf5 import convert_satellite_proto
+from chibis.run import input_generator_satellite
+from chibis.hdf5_tools import get_convertor, ProtoReader
+from chibis.run_tools import multirun_command, \
     dir_name_generator, values_from_dict, InputData
 
 ROOT_PATH = os.path.dirname(__file__)
 
 INPUT_TEMPLATE = """/npm/geometry/type gdml
-/npm/geometry/gdml ../../build/satellite/gdml/satellite.gdml
+/npm/geometry/gdml ../../build/gdml/satellite.gdml
 /npm/visualization false
 /npm/satellite/detector ${mode}
 /npm/satellite/output file
@@ -26,9 +26,6 @@ INPUT_TEMPLATE = """/npm/geometry/type gdml
 /run/beamOn ${number}
 exit
 """
-
-
-
 
 
 def main():
@@ -55,7 +52,7 @@ def main():
     )
 
     input_data = input_generator_satellite(meta, INPUT_TEMPLATE, init_pos=[0.0,0.0, 0.1])
-    command = "../../build/satellite/geant4-satellite.exe"
+    command = "../../build/geant4-chibis.exe"
     readers = [ProtoReader("deposit.proto.bin", proto_convertor=convert_satellite_proto)]
     multirun_command(input_data, command, post_processor=get_convertor(readers, OUTPUT_FILE, clear=True))
     return 0

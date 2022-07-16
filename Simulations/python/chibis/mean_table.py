@@ -4,11 +4,12 @@ from dataclasses import dataclass
 import logging
 import numpy as np
 import tables
-from phd.satellite.satellite_pb2 import MeanRun
-from phd.utils.run_tools import InputData
-from tables import open_file, Filters, File
+from .satellite_pb2 import MeanRun
+from .run_tools import InputData
+from tables import open_file, Filters
 
 logger = logging.getLogger(__name__)
+
 
 class MeanTable:
 
@@ -26,6 +27,7 @@ class MeanTable:
                 # ("theta_unit", "U6")
             ]
         )
+
     def init_table(self):
         filters = Filters(complevel=3, fletcher32=True)
         table = self.file.create_table(self.file.root, "deposit", description=self.dtype, filters=filters)

@@ -4,7 +4,7 @@
 import setuptools
 
 setuptools.setup(
-    name="phd",
+    name="chibis",
     version="0.0.1",
     packages=setuptools.find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
     install_requires=[
@@ -12,6 +12,7 @@ setuptools.setup(
         'scipy',
         'matplotlib',
         'tables',
-        'tabulate'
+        'tabulate',
+        'protobuf<=3.20'
     ]
 )

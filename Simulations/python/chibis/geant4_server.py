@@ -10,9 +10,9 @@ import subprocess
 from typing import Generator
 from multiprocessing import Process, Queue
 
-from phd.satellite.mean_table import MeanTable
-from phd.satellite.run import QueueData, request_generator
-from phd.satellite.satellite_pb2 import MeanRun
+from .mean_table import MeanTable
+from .run import QueueData, request_generator
+from .satellite_pb2 import MeanRun
 
 
 INIT_TEMPLATE = Template(
@@ -40,8 +40,9 @@ class Geant4Server:
     def _start(self):
         """
         :param mode:
-            Если mode =  DetectorMode.SINGLE то сервер возвращает данные пособытийно, то есть распредление энерговыделегний в детекторе для каждого отдельного события
-            Если mode =  DetectorMode.SUM то сервер будет возвращать сумарное энерговыделение за сеанс от всех событий
+            Если mode = DetectorMode.SINGLE то сервер возвращает данные по событийно, то есть распределение
+                                            энерговыделений в детекторе для каждого отдельного события
+            Если mode = DetectorMode.SUM то сервер будет возвращать суммарное энерговыделение за сеанс от всех событий
         :return:
         """
         logging.info("Start server: {}".format(self.command))

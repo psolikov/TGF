@@ -8,7 +8,7 @@ from multiprocessing import Pool
 from string import Template
 from timeit import default_timer as timer
 from typing import Optional
-
+from tqdm import tqdm
 import numpy as np
 import abc
 
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 def no_gdmL_input_generator(meta: dict, macros_template: str):
     macros_template = Template(macros_template)
     for path, values in zip(
-            dir_name_generator(".", "sim"),
+            dir_name_generator("sim"),
             values_from_dict(meta)
     ):
         text = macros_template.substitute(values)
@@ -37,7 +37,7 @@ def general_input_generator(meta: dict, gdml_template_file: str, macros_template
     paths = list(map(lambda x: os.path.join("..", x), paths))
     meta["macros"]["path"] = paths
     for path, values in zip(
-            dir_name_generator(".", "sim"),
+            dir_name_generator("sim"),
             values_from_dict(meta["macros"])
     ):
         text = macros_template.substitute(values)
@@ -68,7 +68,7 @@ def input_generator_custom_gdml(meta: dict, gdml_template_file: str, macros_temp
     meta["macros"]["path"] = paths
     macros_template = Template(macros_template)
     for path, values in zip(
-            dir_name_generator(".", "sim"),
+            dir_name_generator("sim"),
             values_from_dict(meta["macros"])
     ):
         text = macros_template.substitute(values)
@@ -107,9 +107,6 @@ def create_one_file(text, foutput, values: dict):
     with open(foutput, 'w') as fout:
         fout.write(template.safe_substitute(values))
     return foutput
-
-
-from tqdm import tqdm
 
 
 def values_from_dict(values: dict):

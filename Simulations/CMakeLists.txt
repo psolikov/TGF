@@ -24,6 +24,8 @@ FILE(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
 
 # Здесь добавлять proto файлы
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS proto/satellite.proto proto/histogram.proto)
+protobuf_generate_python(PY_SOURCES proto/satellite.proto proto/histogram.proto)
+add_custom_target(py_proto ALL DEPENDS ${PY_SOURCES})
 
 ADD_EXECUTABLE(geant4-chibis.exe main.cc
         ${sources}
@@ -44,7 +46,8 @@ TARGET_LINK_LIBRARIES(geant4-chibis.exe
 # Здесь добавлять gdml и mac файлы чтобы скопировать их в место сборки
 set(PROGRAM_SCRIPTS
         init_vis.mac
-#        gdml/satellite.gdml
+        macros/init.mac
+        gdml/satellite.gdml
         )
 
 foreach(_script ${PROGRAM_SCRIPTS})

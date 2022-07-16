@@ -4,12 +4,12 @@ from typing import Union
 
 import numpy as np
 from dataforge import Meta
-from phd.utils.run_tools import dir_name_generator, values_from_dict, InputData
+from .run_tools import dir_name_generator, values_from_dict, InputData
 
 def input_generator_satellite(meta: Meta, macros_template: str, init_pos):
     macros_template = Template(macros_template)
     for path, values in zip(
-            dir_name_generator(".", "sim"),
+            dir_name_generator("sim"),
             values_from_dict(meta["macros"])
     ):
         theta = values["theta"]

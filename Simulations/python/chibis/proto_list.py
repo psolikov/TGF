@@ -5,9 +5,10 @@ from typing import Type
 
 class ProtoList(Sized):
     BUFF_SIZE = 8
-    def __init__(self, path, topClass: Type):
+
+    def __init__(self, path, proto_class: Type):
         self.path = path
-        self.topClass = topClass
+        self.proto_class = proto_class
 
     def __enter__(self):
         self.fin = open(self.path, "rb")
@@ -34,9 +35,9 @@ class ProtoList(Sized):
     def __getitem__(self, item):
         self.fin.seek(self.coords[item] + self.BUFF_SIZE)
         data = self.fin.read(self.messege_sizes[item])
-        protoClass = self.topClass()
-        protoClass.ParseFromString(data)
-        return protoClass
+        proto = self.proto_class()
+        proto.ParseFromString(data)
+        return proto
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.fin.close()
